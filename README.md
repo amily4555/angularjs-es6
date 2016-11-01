@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [![Build Status](https://travis-ci.org/r-park/angular2-webpack-seed.svg?branch=master)](https://travis-ci.org/r-park/angular2-webpack-seed)
 
 
@@ -49,3 +50,6 @@ Usage
 |`npm run test:watch`|Run unit tests with Karma and Jasmine; watch for changes to re-run tests|
 |`npm run typings`|Install ambient typings|
 |`npm version`|Bump package.json version, generate CHANGELOG.md, git commit and tag (see [npm version](https://docs.npmjs.com/cli/version))|
+=======
+#NG2-WEBPACK-BOOTSTRAP4
+>>>>>>> 1e6ab09e997e0a502e19dfcb4c61256bbfa6471d
