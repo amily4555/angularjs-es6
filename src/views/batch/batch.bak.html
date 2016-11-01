@@ -1,0 +1,76 @@
+<button class="btn btn-lg btn-outline-primary" (click)="open()">Launch demo modal</button>
+
+<hr>
+
+<ngb-alert [dismissible]="false">
+    <strong>Warning!</strong>
+    Better check yourself, you're not looking too good.
+</ngb-alert>
+
+<hr>
+
+<p *ngFor="let alert of alerts">
+    <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+</p>
+
+<hr>
+
+<p>
+    <ngb-alert>
+        !!! This alert's type is success and it's not dismissible because the config has been customized
+    </ngb-alert>
+</p>
+
+<hr>
+
+<div class="ngbd-buttons-radio">
+    <div [(ngModel)]="model" ngbRadioGroup name="radioBasic">
+        <label class="btn btn-primary">
+            <input type="radio" [value]="1">
+            Left (pre-checked)
+        </label>
+        <label class="btn btn-primary">
+            <input type="radio" value="middle">
+            Middle
+        </label>
+        <label class="btn btn-primary">
+            <input type="radio" [value]="false">
+            Right
+        </label>
+    </div>
+</div>
+
+<pre>{{model}}</pre>
+
+<hr>
+
+<form class="form-inline">
+    <div class="form-group">
+        <div class="input-group">
+            <input class="form-control"
+                   placeholder="yyyy-mm-dd"
+                   name="dp"
+                   [(ngModel)]="startTime"
+                   (click)="dp.toggle()"
+                   ngbDatepicker
+                   [minDate]="endTime"
+                   #dp="ngbDatepicker">
+            <span class="input-group-addon">-</span>
+
+            <!--<ngb-datepicker [(ngModel)]="endTime"  [disabled]="disabled"></ngb-datepicker>-->
+
+            <input class="form-control"
+                   placeholder="yyyy-mm-dd"
+                   name="dp2"
+                   [(ngModel)]="endTime"
+                   (click)="d.toggle()"
+                   ngbDatepicker
+                   #d="ngbDatepicker"
+            >
+        </div>
+    </div>
+</form>
+
+<pre>startTime: {{ startTime | json }}   |||  {{ endTime | json }}</pre>
+
+<hr />

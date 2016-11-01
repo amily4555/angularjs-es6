@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "removeComments": false,
+
+        // false 编译器无法根据变量的用途推断出变量的类型，它就会悄悄的把变量类型默认为 any
+        "noImplicitAny": false
+    },
+    "files": [
+        "src/main.ts",
+        "typings/index.d.ts"
+    ]
+}
+

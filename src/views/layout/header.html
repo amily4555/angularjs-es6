@@ -1,0 +1,27 @@
+<div class="logo">
+    LIFT-BOSS
+</div>
+
+<ul class="inline nav">
+    <li routerLinkActive="active">
+        <a [routerLink]="['/batch']">批量打单</a>
+    </li>
+
+    <li routerLinkActive="active">
+        <a [routerLink]="['/export']">导入打印</a>
+    </li>
+</ul>
+
+<ul class="inline bar my">
+    <li class="m-setting">
+        <a [routerLink]="['/setting']">系统设置</a>
+    </li>
+
+    <li routerLinkActive="active">
+        <a [routerLink]="['/admins', 'current']">
+            {{G?.current?.name || '林小米'}}
+        </a>
+    </li>
+
+    <li (click)="logout()">退出</li>
+</ul>
