@@ -1,0 +1,17 @@
+<div>
+    FOOTER COMPONENT
+</div>
+
+<div>
+    <span>select lang</span>
+
+    <select name="lang" ng-model="$ctrl.lang" ng-change="$ctrl.selectLang()">
+        <option value="en">English</option>
+        <option value="zh-cn">中文</option>
+        <option value="jp">日本語</option>
+    </select>
+</div>
+
+<div>
+    i18n:::{{$ctrl.lang}} --- {{ 'HELLO_WORLD' | translate }}
+</div>

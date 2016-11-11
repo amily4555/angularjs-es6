@@ -1,0 +1,9 @@
+<h3>USERS</h3>
+
+<ol>
+    <li ng-repeat="user in UC.users">
+        <a ui-sref="users.detail({userId: user.userId})">{{user.name}}</a> | {{user.province.name}}  | {{user.age}}
+        <br /> {{user.desc}}
+        <br /> <button ng-click="UC.removeUser(user)">删除</button>
+    </li>
+</ol>
