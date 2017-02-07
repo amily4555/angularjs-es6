@@ -6,18 +6,20 @@ import angular from 'angular';
 
 let log = angular.module('log', [])
 
-    .provider('$log', ['app', function(app) {
+    .provider('$$log', ['app', 'C', function(app, C) {
 
         this.log = function() {
-            app.debug && console.log(...arguments);
+            C.DEBUG && console.log && console.log.apply && console.log(...arguments);
         };
 
         this.error = function() {
-            app.debug && console.error(...arguments);
+            C.DEBUG && console.error && console.error.apply && console.error(...arguments);
         };
 
-        this.$get = function() {
+        this.$get = () => {
             return {
+                log: this.log,
+                error: this.error
             }
         }
 

@@ -6,10 +6,9 @@ export default class userDetailCtrl {
             });
         });
 
-
         // DEMO, 错误请求
-        $R.users.post({}, (rst) => {
-        });
+        // $R.users.post({}, (rst) => {
+        // });
     }
 }
 

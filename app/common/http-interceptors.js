@@ -5,11 +5,9 @@ import delayering from 'response-data-delayering';
 let httpInterceptors = angular.module('http.interceptors', [
 ])
 
-    .config(['$httpProvider', 'C', 'app', '$logProvider', ($httpProvider, C, app, $logProvider) => {
+    .config(['$httpProvider', 'C', 'app', '$$logProvider', ($httpProvider, C, app, $$logProvider) => {
 
         let sessionToken = mu.storage(C.STORAGE_SESSION_TOKEN) || '';
-
-        console.debug($logProvider);
 
         $httpProvider.interceptors.push(($q) => {
             return {
@@ -68,7 +66,7 @@ let httpInterceptors = angular.module('http.interceptors', [
                             response.data = delayering(rst);
                         }
 
-                        $logProvider.log(':::' + config.url + ':::\n', rst);
+                        $$logProvider.log(':::' + config.url + ':::\n', rst);
 
                         return response;
                     }
@@ -81,7 +79,7 @@ let httpInterceptors = angular.module('http.interceptors', [
                     let config = response.config,
                         httpStatus = response.status;
 
-                    $logProvider.error(':::error:::', config.method, httpStatus, '\n', config.url);
+                    $$logProvider.error(':::error:::', config.method, httpStatus, '\n', config.url);
 
                     switch(httpStatus){
                         // auth

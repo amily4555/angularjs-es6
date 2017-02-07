@@ -8,7 +8,7 @@ let AppRoute = angular.module('app.route', [
     UserRoute.name
 ])
     .config(($stateProvider, $urlRouterProvider) => {
-        $urlRouterProvider.otherwise('/');
+        $urlRouterProvider.otherwise('/users');
     });
 
 
