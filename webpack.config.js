@@ -7,6 +7,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const WebpackMd5Hash = require('webpack-md5-hash');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 
 //=========================================================
@@ -16,35 +17,70 @@ const NODE_ENV = process.env.NODE_ENV;
 
 console.log('oOooooOoo::::::', process.env.NODE_ENV);
 
-const ENV_DEVELOPMENT = NODE_ENV === 'development';
-const ENV_PRODUCTION = NODE_ENV === 'production';
+const ENV_DEV = NODE_ENV === 'dev';
+const ENV_PROD = NODE_ENV === 'prod';
 const ENV_TEST = NODE_ENV === 'test';
-const ENV_STAGING = NODE_ENV === 'staging';
 
 const HOST = process.env.HOST || 'localhost';
 const PORT = process.env.PORT || 3003;
 
 const config = {
-    entry: path.resolve(__dirname, 'app/app.module.js'),
     cache: true,
     debug: true,
-    devtool: 'cheap-module-source-map'
+    devtool: 'cheap-module-source-map',
+    plugins: []
 };
-
-
-module.exports = config;
 
 config.resolve = {
     extensions: ['', '.html', '.js'],
     modulesDirectories: ['node_modules'],
-    root: path.resolve('.')
+
+    //查找module的话从这里开始查找
+    root: path.resolve('.'),
+
+    //模块别名定义，方便后续直接引用别名，无须多写长长的地址
+    alias: {
+        'jquery': require.resolve('jquery'),
+        'mu': require.resolve('mzmu')
+    }
+};
+
+config.entry = {
+    ng: [
+        'angular',
+        'angular-mocks',
+        'angular-resource',
+        'angular-translate',
+        'angular-ui-router',
+        'angular-loading-bar',
+
+        'angular-loading-bar/build/loading-bar.css'
+    ],
+
+    vendor: [
+        'tether',
+        'jquery',
+        'bootstrap',
+        // 'lodash',
+        'mzmu',
+        'response-data-delayering',
+
+        'bootstrap/dist/css/bootstrap.css'
+    ],
+
+    main: [
+        path.resolve(__dirname, 'app/app.module.js')
+    ]
 };
 
 config.module = {
     loaders: [
         {
             test: /\.js$/,
-            include: path.resolve(__dirname, 'app/'),
+            include: [
+                path.resolve(__dirname, 'app/'),
+                path.resolve(__dirname, 'node_modules/response-data-delayering')
+            ],
             loader: 'ng-annotate?map=false!babel-loader',
             presets: ['es2015']
         },
@@ -53,34 +89,35 @@ config.module = {
             include: path.resolve(__dirname, 'app/'),
             loader: 'raw'
         },
-        {
-            test: /\.css$/,
-            loader: 'style!css'
-        },
-        {
-            test: /\.scss$/,
-            loader: 'raw!postcss!sass'
-        },
-        {
-            test: /\.(png|jpg|jpge|gif|woff|woff2|eot|ttf|svg)$/,
-            loader: 'url-loader?limit=100000'
-        }
 
+        /**
+         * 要使用css, post, sass 必须安装下列包
+         * npm install css-loader --save-dev
+         * npm install postcss postcss-loader --save-dev
+         * npm install node-sass sass sass-loader --save-dev
+         */
+        {
+            test: /\.(css|scss)$/,
+            loader: ExtractTextPlugin.extract('style', 'css?-autoprefixer!postcss!sass', {
+                publicPath: '../'
+            })
+        },
+        {
+            test: /\.(woff|woff2|eot|ttf|svg)$/,
+            loader: 'url-loader?limit=4098&name=fonts/[name].[hash].[ext]'
+        },
+        {
+            test: /\.(png|jpg|jpge|gif)$/,
+            loader: 'url-loader?limit=4098&name=images/[name].[hash].[ext]'
+        }
     ]
 };
-
 
 config.output = {
     filename: '[name].js',
     path: path.resolve('./app'),
     publicPath: '/'
 };
-
-config.plugins = [
-    new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify(NODE_ENV)
-    })
-];
 
 config.postcss = [
     autoprefixer({browsers: ['last 3 versions']})
@@ -92,39 +129,37 @@ config.sassLoader = {
     sourceComments: false
 };
 
-config.devServer = {
-    contentBase: './app',
-    historyApiFallback: true,
-    host: HOST,
-    outputPath: config.output.path,
-    port: PORT,
-    publicPath: config.output.publicPath,
-    stats: {
-        cached: true,
-        cachedAssets: true,
-        chunks: true,
-        chunkModules: false,
-        colors: true,
-        hash: false,
-        reasons: true,
-        timings: true,
-        version: false
-    }
-};
 
 config.plugins.push(
+    new webpack.ProvidePlugin({
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery',
+        'window.$': 'jquery',
+
+        // bootstrap v4 before install tether
+        'window.Tether': 'tether',
+
+        // 注入环境变量
+        'GLOBAL': path.resolve(__dirname, './app/env/' + NODE_ENV + '-global.js')
+    }),
+
+    new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(NODE_ENV)
+    }),
+
     new webpack.optimize.CommonsChunkPlugin({
-        name: ['vendor', 'polyfills'],
+        // name: ['vendor', 'polyfills', 'ng'],
+        name: ['vendor', 'ng'],
         minChunks: Infinity
     }),
 
     new CopyWebpackPlugin([
         {from: './app/assets', to: 'assets'},
-        {from: './app/lib', to: 'lib'},
-        {from: './app/env', to: 'env'},
-        {from: './app/get.html', to: ''},
         {from: './app/store', to: 'store'}
     ]),
+
+    new ExtractTextPlugin('./styles/[name].[contenthash].css'),
 
     new HtmlWebpackPlugin({
         chunkSortMode: 'dependency',
@@ -135,14 +170,31 @@ config.plugins.push(
     })
 );
 
+if(ENV_DEV){
+    config.entry.main.unshift(`webpack-dev-server/client?http://${HOST}:${PORT}`);
 
-if(ENV_PRODUCTION) {
-    // config.devtool = 'source-map';
+    config.devServer = {
+        contentBase: './app',
+        historyApiFallback: true,
+        host: HOST,
+        outputPath: config.output.path,
+        port: PORT,
+        publicPath: config.output.publicPath,
+        stats: {
+            cached: true,
+            cachedAssets: true,
+            chunks: true,
+            chunkModules: false,
+            colors: true,
+            hash: false,
+            reasons: true,
+            timings: true,
+            version: false
+        }
+    };
+}
 
-    // config.entry = {
-    //     vendor: path.resolve('./node_modules/angular/angular.js')
-    // };
-
+if(ENV_PROD) {
     config.output = {
         filename: '[name].[chunkhash].js',
         path: path.resolve('./dist'),
@@ -150,23 +202,37 @@ if(ENV_PRODUCTION) {
     };
 
     config.plugins.push(
+        new CleanWebpackPlugin(['dist'], {
+            verbose: true
+        }),
         new WebpackMd5Hash(),
-        new ExtractTextPlugin('styles.[contenthash].css'),
+
+        new HtmlWebpackPlugin({
+            chunkSortMode: 'dependency',
+            filename: 'index.html',
+            hash: false,
+            inject: 'body',
+            template: './app/index.html',
+            //压缩HTML文件
+            minify: {
+                //移除HTML中的注释
+                removeComments: true,
+                //删除空白符与换行符
+                collapseWhitespace: true
+            }
+
+        }),
         new webpack.optimize.DedupePlugin(),
         new webpack.optimize.UglifyJsPlugin({
-            mangle: true,
+            mangle: false,
             compress: {
                 dead_code: true, // eslint-disable-line camelcase
                 screw_ie8: true, // eslint-disable-line camelcase
                 unused: true,
                 warnings: false
             }
-        }),
-
-        new CopyWebpackPlugin([
-            {from: path.resolve('./dist'), to: path.resolve('../ec____ui/dist')}
-
-        ])
+        })
     );
 }
 
+module.exports = config;

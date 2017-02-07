@@ -1,0 +1,18 @@
+header {
+    background: #f0ad4e;
+
+    menu {
+        display: inline-block;
+        margin-right: 10px;
+        padding: 0 10px;
+        height: 42px;
+        line-height: 42px;
+        background: #12aca3;
+        color: #fff;
+
+        &:hover,
+        &.active {
+            background: #00b3ee;
+        }
+    }
+}

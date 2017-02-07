@@ -26,9 +26,12 @@ let constant = angular.module('constant', [
         debug: true
     })
 
-    .run(['$injector', 'app', function($injector, app) {
+    .run(['$injector', '$rootScope', 'app', '$state', function($injector, $rootScope, app, $state) {
         // 常用服务初始化
         app.$injector = $injector;
+        $rootScope.$state = $state;
+
+        console.debug( $state );
     }]);
 
 export default constant;

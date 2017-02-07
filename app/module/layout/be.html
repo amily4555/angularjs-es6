@@ -1,8 +1,8 @@
 <header>
     <nav>
-        <menu ui-sref="be">be</menu>
-        <menu ui-sref="fe">fe</menu>
-        <menu ui-sref="users">users</menu>
+        <menu ui-sref="fe" ng-class="{'active': $root.$state.is('fe')}">fe</menu>
+        <menu ui-sref="be" ng-class="{'active': $root.$state.is('be')}">be</menu>
+        <menu ui-sref="users" ng-class="{'active': $root.$state.is('users')}">users</menu>
     </nav>
 </header>
 

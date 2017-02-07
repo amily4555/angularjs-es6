@@ -1,7 +1,8 @@
-import angular from "angular";
-import feTpl from "./fe.html";
-import beTpl from "./be.html";
+import angular from 'angular';
+import feTpl from './fe.html';
+import beTpl from './be.html';
 
+import './be.scss';
 
 let LayoutRoute = angular.module('layout.route', [])
 
