@@ -6,3 +6,4 @@ node_modules
 .git
 .settings
 *.log
+dist
