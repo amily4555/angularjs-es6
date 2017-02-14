@@ -26,17 +26,19 @@ const PORT = process.env.PORT || 3003;
 
 const config = {
     cache: true,
-    debug: true,
+    // debug: true,
     devtool: 'cheap-module-source-map',
     plugins: []
 };
 
 config.resolve = {
-    extensions: ['', '.html', '.js'],
-    modulesDirectories: ['node_modules'],
+    extensions: ['.html', '.js'],
+    modules: [
+        path.resolve(__dirname, 'node_modules')
+    ],
 
     //查找module的话从这里开始查找
-    root: path.resolve('.'),
+    // root: path.resolve('.'),
 
     //模块别名定义，方便后续直接引用别名，无须多写长长的地址
     alias: {
@@ -61,10 +63,8 @@ config.entry = {
         'tether',
         'jquery',
         'bootstrap',
-        // 'lodash',
         'mzmu',
         'response-data-delayering',
-
         'bootstrap/dist/css/bootstrap.css'
     ],
 
@@ -74,20 +74,20 @@ config.entry = {
 };
 
 config.module = {
-    loaders: [
+    rules: [
         {
             test: /\.js$/,
             include: [
                 path.resolve(__dirname, 'app/'),
                 path.resolve(__dirname, 'node_modules/response-data-delayering')
             ],
-            loader: 'ng-annotate?map=false!babel-loader',
-            presets: ['es2015']
+            use: ['ng-annotate-loader?map=false', 'babel-loader']
+            // presets: ['es2015']
         },
         {
             test: /\.html$/,
             include: path.resolve(__dirname, 'app/'),
-            loader: 'raw'
+            use: 'raw-loader'
         },
 
         /**
@@ -98,17 +98,23 @@ config.module = {
          */
         {
             test: /\.(css|scss)$/,
-            loader: ExtractTextPlugin.extract('style', 'css?-autoprefixer!postcss!sass', {
+            use: ExtractTextPlugin.extract({
+                fallback: 'style-loader',
+                use: [
+                    'css-loader',
+                    'postcss-loader',
+                    'sass-loader'
+                ],
                 publicPath: '../'
             })
         },
         {
             test: /\.(woff|woff2|eot|ttf|svg)$/,
-            loader: 'url-loader?limit=4098&name=fonts/[name].[hash].[ext]'
+            use: 'url-loader?limit=4098&name=fonts/[name].[hash].[ext]'
         },
         {
             test: /\.(png|jpg|jpge|gif)$/,
-            loader: 'url-loader?limit=4098&name=images/[name].[hash].[ext]'
+            use: 'url-loader?limit=4098&name=images/[name].[hash].[ext]'
         }
     ]
 };
@@ -119,26 +125,41 @@ config.output = {
     publicPath: '/'
 };
 
-config.postcss = [
-    autoprefixer({browsers: ['last 3 versions']})
-];
-
-config.sassLoader = {
-    outputStyle: 'compressed',
-    precision: 10,
-    sourceComments: false
-};
-
+// config.postcss = [
+//     autoprefixer({browsers: ['last 3 versions']})
+// ];
+//
+// config.sassLoader = {
+//     outputStyle: 'compressed',
+//     precision: 10,
+//     sourceComments: false
+// };
 
 config.plugins.push(
+    new webpack.LoaderOptionsPlugin({
+        debug: true,
+        options: {
+            // postcss: autoprefixer({browsers: ['last 3 versions']}),
+            sassLoader: {
+                outputStyle: 'compressed',
+                precision: 10,
+                sourceComments: false
+            }
+        }
+    }),
+
+    new webpack.optimize.CommonsChunkPlugin({
+        // name: ['vendor', 'polyfills', 'ng'],
+        name: ['vendor', 'ng'],
+        minChunks: Infinity
+    }),
+
     new webpack.ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
-        'window.jQuery': 'jquery',
-        'window.$': 'jquery',
 
         // bootstrap v4 before install tether
-        'window.Tether': 'tether',
+        'Tether': 'tether',
 
         // 注入环境变量
         'GLOBAL': path.resolve(__dirname, './app/env/' + NODE_ENV + '-global.js')
@@ -148,18 +169,16 @@ config.plugins.push(
         'process.env.NODE_ENV': JSON.stringify(NODE_ENV)
     }),
 
-    new webpack.optimize.CommonsChunkPlugin({
-        // name: ['vendor', 'polyfills', 'ng'],
-        name: ['vendor', 'ng'],
-        minChunks: Infinity
-    }),
-
     new CopyWebpackPlugin([
         {from: './app/assets', to: 'assets'},
         {from: './app/store', to: 'store'}
     ]),
 
-    new ExtractTextPlugin('./styles/[name].[contenthash].css'),
+    new ExtractTextPlugin({
+        filename: './styles/[name].[contenthash].css',
+        allChunks: true,
+        disable: false
+    }),
 
     new HtmlWebpackPlugin({
         chunkSortMode: 'dependency',
@@ -170,7 +189,7 @@ config.plugins.push(
     })
 );
 
-if(ENV_DEV){
+if(ENV_DEV) {
     config.entry.main.unshift(`webpack-dev-server/client?http://${HOST}:${PORT}`);
 
     config.devServer = {
@@ -222,7 +241,7 @@ if(ENV_PROD) {
             }
 
         }),
-        new webpack.optimize.DedupePlugin(),
+        // new webpack.optimize.DedupePlugin(),
         new webpack.optimize.UglifyJsPlugin({
             mangle: false,
             compress: {

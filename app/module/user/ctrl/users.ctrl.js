@@ -1,19 +1,3 @@
-// let usersCtrl = function ($R) {
-//
-//     var vm = this;
-//
-//     $R.users.get({}, function(rst){
-//         vm.users = rst.data;
-//     });
-//
-//     return vm;
-// };
-//
-// export default usersCtrl;
-
-
-import mu from 'mzmu';
-
 export default class usersCtrl {
     constructor($R){
         this.$R = $R;
