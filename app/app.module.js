@@ -3,6 +3,7 @@ import uiRouter from 'angular-ui-router';
 import ngLoadingBar from 'angular-loading-bar';
 import 'angular-loading-bar/build/loading-bar.css';
 import 'bootstrap/dist/css/bootstrap.css';
+import 'simple-line-icons/scss/simple-line-icons.scss';
 
 import httpInterceptors from './common/http-interceptors';
 import resourceEnhanced from './common/resource-enhanced';
