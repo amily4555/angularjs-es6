@@ -1,6 +1,6 @@
 {
     "name": "AngularJs-Seed",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Mizi Angularjs 1.6+ & ES6 & Webpack Seed",
     "dependencies": {
         "angular": "1.6.1",

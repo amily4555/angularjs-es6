@@ -65,11 +65,12 @@ config.entry = {
         'bootstrap',
         'mzmu',
         'response-data-delayering',
-        'bootstrap/dist/css/bootstrap.css'
+        'bootstrap/dist/css/bootstrap.css',
+        'simple-line-icons/scss/simple-line-icons.scss'
     ],
 
     main: [
-        path.resolve(__dirname, 'app/app.module.js')
+        path.resolve(__dirname, 'app/app.init.js')
     ]
 };
 
